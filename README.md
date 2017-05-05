@@ -154,8 +154,26 @@ sur se suject plus bas avant de passer au reste.
 
 #### 2) Ajout des libraires nécessaire
 
+La première vrai étape de code à écrire est d'ajouter les dépendences nécessaire pour le projet. Il y a plusieurs facon
+pour les installer mais ici je vais tous simplement les ajouter manuellement dans mon fichier .csproj.
+
+Je vais ajouter premièrement la librairie Npgsql pour EF core
+```xml
+<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="1.1.0" />
+<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+```
+Anssi qu'un port de EPPlus sur .NET core pour travailler avec des documents spreadcheat excel
+```xml
+<PackageReference Include="EPPlus.Core" Version="1.3.2" />
+```
+
+Lorsqu'on ajoute des librairies, pour les ajouter on utilise la commande
+*dotnet restore* dans le même repertoire que notre fichier.csproj pour
+télécharger les dépendences nécessaire pour l'application. Dans un IDE
+comme VS code ou visual studio les changements sont détecter automatiquement et executer en arrière plan.
 
 #### 3) Création des objects de notre model EF6
+
 
 #### 4) Configuration ASP.NET core Identity
 
