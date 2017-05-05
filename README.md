@@ -16,6 +16,12 @@ développement avec Arch Linux pour toute les composentes du site web.
 
 Le site qui sera développer est un intranet pour une entreprise de publicité.
 
+### Compétence Nécessaire
+
+* Language C# dans le framework .NET peux importe la version
+* System.Thread.Task et System.Linq 
+* Connaissance en Base de Donnée relationnel
+
 ### Configuration votre ordinateur
 
 Avant de commencer voici les possibilités d'application pour développer le projet.
@@ -62,7 +68,23 @@ AAA et doit pouvoir être servit publiquement de facon sécuritaire (SSL)
 
 #### Fonctionnalité nécessaire
 
+* Authentification pour atteindre l'intérieur du site web
+* Restriction de certaine page selon le role dans l'entreprise (vendeur,administrateur)
+
+
+
 #### Conception base de donnée
+
+Liste des Tables:
+* Adresse : contient une adresse
+* ContactInfo : contient les informations pour contacter une personne (email,telephone,...)
+* Employer : compte d'un employé pour se connecter dans l'intranet
+* MRC : contient les régions dans lequels ils ont des entreprises
+* VendeurInfo : tables lié a un employer qui est vendeur pour contenir c'est rencontres et rapports
+* Entreprise : contient les informations des entreprises 
+* ContactEntreprise : lié a une entreprise contient la personne qu'on peut contacter dans l'entreprise
+* Rencontre : lié a une entreprise contient un evenement pour une rencontre
+* Rapport : lié a une rencontre , il s'agit du rapport de la rencontre écris par chaque vendeur après la rencontre
 
 
 ### Application
@@ -145,6 +167,7 @@ Pip:
 
 
 
+
 ### Installation du système de base
 
 
@@ -154,30 +177,44 @@ Pip:
 
 #### Doc
 
+Documentation/Tutoriel officiel de Microsoft pour développer application ASP.NET core
 [Documentation ASP.NET core Microsoft](https://docs.microsoft.com/en-us/aspnet/core/)
 
+Rérerence des API de .NET, très utile contient souvent des exemples d'utilisations pour les objects du framework
 [API reference .NET](https://docs.microsoft.com/en-us/dotnet/api/)
 
+Packet manager pour .NET, si vous voulez chercher les libraires qui existe pour .NET faite attention pas tous
+est disponible dans .NET core 1.1
 [Packet Nuget](https://www.nuget.org/packages/DotNetCore)
 
+Tutoriel exclusivement sur Entity Framework 6 et explication de son fonctionnement avec les Base de Données
 [Tutoriel EF 6](http://www.entityframeworktutorial.net/EntityFramework5/entity-framework5-introduction.aspx)
 
+Guide de Microsoft sur comment bien construire c'est API pour le web
 [API Design](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
 
+Différents guide sur comment structurer différents type d'application web
 [Guide Architecture Web de microsoft](https://www.microsoft.com/net/architecture)
 
+Guide pour permettre le deboguage à distance avec une machine Linux avec une connection SSH
 [Debug .NET core par SSh](https://blogs.msdn.microsoft.com/visualstudioalm/2017/01/26/debugging-net-core-on-unix-over-ssh/)
 
+Generateur de project pour ASP.NET core open source, très utile si on n'a pas Visual Studio et permet de crée c'est propre
+template d'application
 [generator-aspnet](https://github.com/omnisharp/generator-aspnet#readme)
 
-[Open Source intellisence -> omnisharp](https://github.com/omnisharp/)
+Omnisharp est un project OpenSource pour permettre le développement en C# .NET sur toute les plateformes et dans une
+multitude d'editeur( Je l'utilse dans VS Code)
+[Open Source intellisence -> omnisharp](https://github.om/omnisharp/)
 
+Project de 69 exemple d'application ASP.NET core, traite plus du routing et middleware que de MVC
 [69 samples aspnetcore](https://github.com/dodyg/practical-aspnetcore)
 
+Liste de librairie, outils et framework pour .NET
 [Awesome .Net](https://github.com/quozd/awesome-dotnet)
 
+Séries de tutoriel video sur ASP.NTE core sur channel 9 un site de podcast/blogging par des employés de Microsoft pour Microsoft
 [ASP.NET Monsters](https://channel9.msdn.com/Series/aspnetmonsters)
-
 
 #### Application
 
@@ -185,8 +222,8 @@ Pip:
 
 [Visual Studio Community](https://www.visualstudio.com/vs/community/)
 
-
-
 ### Livre
 
+Excellent livre qui suit en détail le développement d'une application ASP.NET core MVC
+une versione plus en détail de ce que je fais for some $$$$
 [Livre PRO ASP.NET Core MVC](http://www.apress.com/us/book/9781484203989)
