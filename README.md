@@ -21,6 +21,9 @@ Le site qui sera développer est un intranet pour une entreprise de publicité.
 * Language C# dans le framework .NET peux importe la version
 * System.Thread.Task et System.Linq 
 * Connaissance en Base de Donnée relationnel
+* Connaissance en Linux si vous voulez un serveur de développement
+... si vous aimez payez de l'argent et sauvez du temps vous pouvez
+... utilser Azure à la place mais il n'en sera pas question ici
 
 ### Configuration votre ordinateur
 
@@ -47,7 +50,7 @@ action la conception faite à l'étape précédente.
 
 ### UML
 
-### Définition du l'application ( cas fictif )
+### Définition du l'application
 
 Des clients qui possèdent une entreprise de publicité souhaite se faire développer un site web du style intranet
 Pour pouvoir intéragir avec une base de donnée qui contienderait les entreprises avec lesquels ils fonts afferts
@@ -71,6 +74,29 @@ AAA et doit pouvoir être servit publiquement de facon sécuritaire (SSL)
 * Authentification pour atteindre l'intérieur du site web
 * Restriction de certaine page selon le role dans l'entreprise (vendeur,administrateur)
 
+Commun:
+* Faire des Query dans les différents tables de la base de donnée selon des Models prédéfinis
+.. pour nos Vues.
+* Modifier les informations de leur compte (mdp,information)
+* Scheduler une rencontre avec une entreprise, ajouter entreprise et ses informations
+* Envoyer des emails prédéfinis a des contacts d'entreprise
+
+Pour Vendeur:
+* Consulter son "Dashbord" pour voires c'est tâches assigner comme les entreprise a contacter
+... et c'est rencontres à venir.
+* Afficher un rapport pour une certaine periode de temps(exemple pour les 3 prochain jours):
+    * D'entreprise a rencontrer
+    * De rapport à écrire
+    * D'entreprise à essayer de contacter
+
+Pour Administrateur:
+* Menu assigner tâche de Contacter une entreprise a un vendeur
+* Crée des pool d'entreprise à contacter dans une Région pour les vendeurs de cette région
+* Ajouter des employes , régions et vendeurs
+* Crée des fichiers de recontres du type (???) qu'il peut exporter ou envoyer par email
+... à un pool d'adresse email (par exemple tous c'est vendeurs)
+* Importer des documents excel dans remplir la base de donnée si le skel de ce fichier
+... est connue par le site.
 
 
 #### Conception base de donnée
@@ -79,7 +105,7 @@ Liste des Tables:
 * Adresse : contient une adresse
 * ContactInfo : contient les informations pour contacter une personne (email,telephone,...)
 * Employer : compte d'un employé pour se connecter dans l'intranet
-* MRC : contient les régions dans lequels ils ont des entreprises
+* Région : contient les régions dans lequels ils ont des entreprises
 * VendeurInfo : tables lié a un employer qui est vendeur pour contenir c'est rencontres et rapports
 * Entreprise : contient les informations des entreprises 
 * ContactEntreprise : lié a une entreprise contient la personne qu'on peut contacter dans l'entreprise
@@ -91,7 +117,43 @@ Liste des Tables:
 
 #### 1) Création du project
 
+Pour commencer le développement, je vais crée un projet avec Visual Studio 2017 qui permet d'intégré à la création les
+objects nécessaire pour utiliser le framework Identity pour l'authentification auquel je vais revenir plus tard dans la
+section 4. Lors de la création du project il est possible de choisir API , MVC ou Vide. Bien entendu ici je vais chosir
+de crée une application MVC qui va crée une base avec des controllers de base déja crée. Si vous n'avez pas Visual Studio
+il est aussi possible de crée des projects de base avec l'outil de commande dotnet. Vous pouvez voire la liste possible
+avec la commande suivante :
+
+```bash
+λ dotnet new --help
+[...]
+Templates                 Short Name      Language      Tags
+----------------------------------------------------------------------
+Console Application       console         [C#], F#      Common/Console
+Class library             classlib        [C#], F#      Common/Library
+Unit Test Project         mstest          [C#], F#      Test/MSTest
+xUnit Test Project        xunit           [C#], F#      Test/xUnit
+ASP.NET Core Empty        web             [C#]          Web/Empty
+ASP.NET Core Web App      mvc             [C#], F#      Web/MVC
+ASP.NET Core Web API      webapi          [C#]          Web/WebAPI
+Solution File             sln                           Solution
+
+Examples:
+    dotnet new mvc --auth None --framework netcoreapp1.1
+    dotnet new console --framework netcoreapp1.1
+    dotnet new --help
+
+```
+
+Pour des templates plus avancé l'outils generator-aspnet de Yeoman permet de crée des project sur toute les plateformes
+il fait partis du project Omnisharp vous pouvez allez vous dans les références pour le lien du github pour des informations
+pour comment l'installer sur votre machine et l'utiliser, il y a aussi une video de ASP.NET Monsters sur le sujet.
+
+Avant de passé au reste si vous n'êtes pas famillier avec la structure de l'application veuiller allez voire la section
+sur se suject plus bas avant de passer au reste.
+
 #### 2) Ajout des libraires nécessaire
+
 
 #### 3) Création des objects de notre model EF6
 
@@ -118,14 +180,66 @@ Liste des Tables:
 #### 11) Sécurisation
 
 
-
-
 ## Définition composentes ASP.NET core 1.1
 ---
+
+Pour commencer, l'avantages principales qu'on accorde à ASP.NET core MVC est qu'il est construit de
+facon très modulaire en utilisant des objects qui hérite d'interfaces ou de classe abstraite qu'on
+peut réutiliser pour réimplenter certaine composente selon nos besoins. Mais pour faire cela, il faut
+avoir une bonne connaissance du Framework et des différentes intéractions qui ont lieux dérrière.
+
+
+### Structure d'un project
+
+La structure est lourd est grosse mais en respectant la conventions dans le nom des fichiers
+du project permet d'utiliser des fonctions de facon implicite dans les controleurs et de faciliter
+le routage.
+
+Voici la liste des dossiers dans mon project :
+* Controllers/
+... Contient les objects qui s'occupents de répondre au request
+* Data/
+... Contient les objects qui travail avec la base de données pour nos models
+* Models/
+... Contient les objects de nos models qui seront retourner aux vues et/ou sauvegarder
+... dans la base de donnée
+* Properties/
+... Contient les fichiers de configuration pour l'application comme les paramètres qui sont passé
+... selon l'environnement de production.
+* Services/
+... Repertoire pour définir nos service qui seront injecter dans l'application comme un service d'envoi
+... de courriel
+* Views/
+... Contient les views que nos controller vous utiliser pour render les pages webs et les retourner au client
+* Infrastructure/
+... Contient nos Tag Helpers et View Components
+* Filters/
+... Contient nos filtres
+* wwwroot/
+... Répertoire root de l'application web qui contient les fichiers statiques comme nos fichiers CSS et JavaScript
+* .bowerrc and bower.json
+... Fichier de configuration pour bower, un package manager pour le web qui permet d'ajouter des libraires Jquery/bootsrap par
+... exemple dans notre web root
+* .appsettings.*
+... Contient des configs qui sont passé a l'application au démarrage, on peux en définir pour différent environnement 
+* bundleconfig.json
+... Ajouter par défault dans notre project il s'agit du fichier de configuration pour le "Bundling and minification" il s'agit
+... de technique pour améliorer performance du chargement des pages web en "bundling"/combinant plusieurs fichier css/js ensemble
+... allez en lire d'avantage ici : [Bundling and minification](https://docs.microsoft.com/en-us/aspnet/core/client-side/bundling-and-minification)
+* *.csproj
+... Fichier xml qui contient les informations de build et les dépendences du project à télécharger pour executer le project,
+... aussi dans se fichier les target possible sont mentionné(os)
+* Program.cs
+... Si vous le saviez pas notre application n'est qu'une application console et la main thread est démarrer ici avec les modules
+... voulu spécifier
+* Startup.cs
+... Fichier qui contient la classe qui est lancé au lancement de l'application pour configurer ses routage et ses services.
 
 ### MVC
 
 ### Entity Framework 6
+
+### Logging
 
 ### Tag Helpers
 
@@ -154,7 +268,7 @@ Voici la listes des pacquets nécessaire
 Pacman :
 * base unzip vim curl wget zsh grml-zsh-config tmux grub openssh git iptables (Logiciels de bases)
 * nginx certbot-nginx (Serveur Web)
-* postgresql (Base de donné postgresql
+* postgresql (Base de donné)
 
 AUR:
 * lttng-ust
@@ -164,8 +278,6 @@ AUR:
 
 Pip:
 * pgadmin4
-
-
 
 
 ### Installation du système de base
@@ -201,7 +313,7 @@ Guide pour permettre le deboguage à distance avec une machine Linux avec une co
 
 Generateur de project pour ASP.NET core open source, très utile si on n'a pas Visual Studio et permet de crée c'est propre
 template d'application
-[generator-aspnet](https://github.com/omnisharp/generator-aspnet#readme)
+[generator-aspnet](https://gthub.com/omnisharp/generator-aspnet#readme)
 
 Omnisharp est un project OpenSource pour permettre le développement en C# .NET sur toute les plateformes et dans une
 multitude d'editeur( Je l'utilse dans VS Code)
